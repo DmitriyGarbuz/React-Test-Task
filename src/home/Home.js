@@ -15,12 +15,28 @@ class Home extends Component {
     constructor(props){
         super(props)
         this.state = {
-
-            
-
+title: '',
     }
     }
 
+    setChange = (e) => {
+      this.setState({[e.target.name]: e.target.value})
+  }
+onUnlimited = () => {
+  alert("Сongratulate! Your package Unlimited!");
+}
+onStandart = () => {
+  alert("Сongratulate! Your package Standart!");
+}
+onBasic = () => {
+  alert("Сongratulate! Your package Basic!");
+}
+
+onSubmit = (e) => {
+    e.preventDefault();
+   alert(this.state.title);
+    this.setState({title: '' });
+}   
     render () {
         return (<div>
 <div className="heder">
@@ -33,7 +49,7 @@ class Home extends Component {
         <NavLink to="/user"><button type="button" className="btn btn-outline-primary btn-lg">View Stats</button></NavLink>
      </div>
      <div className="col-4 ">
-       <div className="col align-self-end" id="mobile">
+       <div className="col align-self-center" id="mobile">
          <img src={Phone} className="rounded float-right" alt="phone"></img>
        </div>
      </div>
@@ -123,7 +139,7 @@ Search &amp; SEO Analytics
 2 months technical support
 2+ profitable keyword</p>
             <div className="btn-center">
-               <button type="button" className="btn btn-primary btn-lg">Purchase now</button>
+               <button type="button" className="btn btn-primary btn-lg" onClick={this.onBasic}>Purchase now</button>
             </div>
          </div>
        </div>
@@ -141,7 +157,7 @@ Search &amp; SEO Analytics
 2 months technical support
 2+ profitable keyword</p>
              <div className="btn-center">
-               <button type="button" className="btn btn-primary btn-lg">Purchase now</button>
+               <button type="button" className="btn btn-primary btn-lg" onClick={this.onStandart}>Purchase now</button>
             </div>
           </div>
        </div>
@@ -158,7 +174,7 @@ Search &amp; SEO Analytics
 2 months technical support
 2+ profitable keyword</p>
              <div className="btn-center">
-               <button type="button" className="btn btn-primary btn-lg">Purchase now</button>
+               <button type="button" className="btn btn-primary btn-lg" onClick={this.onUnlimited}>Purchase now</button>
             </div>
           </div>
        </div>
@@ -173,9 +189,9 @@ Search &amp; SEO Analytics
 <div className="row justify-content-center">
   <div className="input-center">
 <div className="input-group mb-3">
-  <input type="text" className="form-control" placeholder="Enter your email" aria-label="Recipient's username" aria-describedby="button-addon2"/>
+  <input type="text" className="form-control" name="title" placeholder="Enter your email" aria-label="Recipient's username" aria-describedby="button-addon2" value={this.state.title} onChange={this.setChange}/>
   <div className="input-group-append">
-    <button className="btn btn-primary btn-lg" type="button" id="button-addon2">Subscribe</button>
+    <button className="btn btn-primary btn-lg" type="submit" onClick={this.onSubmit} id="button-addon2">Subscribe</button>
   </div>
 </div>
 </div>

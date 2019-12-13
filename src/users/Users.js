@@ -6,7 +6,8 @@ import Futer from '../futer/Futer';
 import Data  from '../lib/users.json';
 import DataUser from '../lib/users_statistic.json';
 //import React, { useState } from 'react';
-
+import Pagination from 'react-bootstrap/Pagination';
+//import PageItem from 'react-bootstrap/PageItem';
 
 
 
@@ -20,20 +21,24 @@ class List extends Component {
         ip_address: this.props.ip_address || '',
         last_name: this.props.last_name || '',
         clicks:  this.props.allClicks || '',
-        page_views: this.props.allPage_views || ''
+        page_views: this.props.allPage_views || '',
+        nav: { pathname: '/user/:id-'+ this.props.id,
+      state: this.props.id }|| '',
       }
       render() {
 
-        return (
+        return ( 
             <tr>
-             <th scope="row">{this.state.id}</th>
-            <td>{this.state.first_name}</td>
+            
+            <th scope="row"><NavLink to={this.state.nav}  >{this.state.id}</NavLink></th>
+            <td><NavLink to={this.state.nav}  >{this.state.first_name}</NavLink></td>
             <td>{this.state.last_name}</td>
             <td>{this.state.email}</td>
             <td>{this.state.gender}</td>
             <td>{this.state.ip_address}</td>
             <td>{this.state.clicks}</td>
             <td>{this.state.page_views}</td>
+            
           </tr>
       )};
     }
@@ -46,7 +51,7 @@ class Users extends Component {
     constructor(props){
         super(props)
         this.state = {
-page: [{size: 1, active: false, s:0, e:51 },
+page: [{size: 1, active: true, s:0, e:51 },
        {size: 2, active: false, s:50, e:101 },
        {size: 3, active: false , s:100, e:151 },
        {size: 4, active: false , s:150, e:201 },
@@ -80,6 +85,8 @@ user_id:  '',
 data_clicks: [],
 clicks:  '',
 date: '',
+items: [],
+numb: 1,
 page_views:  ''
     }  
 
@@ -91,104 +98,130 @@ componentDidMount() {
 const start = this.state.start;
 const end = this.state.end;
 
+this.getStat = (Data, DataUser, start, end) => {
+  if(start === 0){        
+    let info = Data.filter(item => item.id < end);
+    let infoUser = DataUser.filter(item => item.user_id < end);
 
+    this.getClicks = (info, infoUser) => {
+      let n = 1;
+      do {
+         if (n === 1){let user = infoUser.filter(item => item.user_id === info[0].id); 
+          let clicks = user.reduce((a, b) => a + b.clicks, 0);
+          let page_views = user.reduce((a, b) => a + b.page_views, 0);
+          let data_clicks = info[0];
+          data_clicks['allClicks'] = clicks;
+          data_clicks['allPage_views'] = page_views;
+        }
+        let user = infoUser.filter(item => item.user_id === info[n].id); 
+          let clicks = user.reduce((a, b) => a + b.clicks, 0);
+          let page_views = user.reduce((a, b) => a + b.page_views, 0);
+          let data_clicks = info[n];
+          data_clicks['allClicks'] = clicks;
+          data_clicks['allPage_views'] = page_views;
+        n += 1;
+      }while ( n < 50);          
+       }
+       this.getClicks (info, infoUser);
+       this.setState({datas: info, datas_users: infoUser});
+
+ }else{         
+  let info1 = Data.filter(item => item.id < end);
+  let infoUser1 = DataUser.filter(item => item.user_id < end);
+  let info = info1.filter(item => item.id > start);
+  let infoUser = infoUser1.filter(item => item.user_id > start);
+
+  this.getClicks = (info, infoUser) => {
+    let n = 1;
+    do {
+      if (n === 1){let user = infoUser.filter(item => item.user_id === info[0].id); 
+        let clicks = user.reduce((a, b) => a + b.clicks, 0);
+        let page_views = user.reduce((a, b) => a + b.page_views, 0);
+        let data_clicks = info[0];
+        data_clicks['allClicks'] = clicks;
+        data_clicks['allPage_views'] = page_views;
+      }
+      let user = infoUser.filter(item => item.user_id === info[n].id); 
+        let clicks = user.reduce((a, b) => a + b.clicks, 0);
+        let page_views = user.reduce((a, b) => a + b.page_views, 0);
+        let data_clicks = info[n];
+        data_clicks['allClicks'] = clicks;
+        data_clicks['allPage_views'] = page_views;
+      n += 1;
+    }while ( n < 50);       
+     }
+     this.getClicks (info, infoUser);
+     this.setState({datas: info, datas_users: infoUser});
+}
+
+}
+
+this.pigmintation = (numb, a, b) => {
+  let actives = numb;
+let items = [];
+for (let number = a; number <= b; number++) { 
+  items.push(
+    <Pagination.Item onClick={(e) => this.pigm(number)} key={number} active={number === actives}>
+      {number}
+    </Pagination.Item>,
+  );
+  this.setState({items: items});
+}
+let start = this.state.page[actives-1].s;
+let end = this.state.page[actives-1].e;
+this.setState({start: start, end: end});
+this.getStat(Data, DataUser, start, end);
+}
+this.pigmintation(this.state.numb, this.state.page[0].size, this.state.page[4].size);
+
+this.pigm = (number)  => {
+  let i = number;
+this.setState({numb: i});
+if(i > 5){
+  this.pigmintation(i, this.state.page[5].size, this.state.page[9].size);
+}if(i>10){this.pigmintation(i, this.state.page[10].size, this.state.page[14].size);}
+if(i>15) {this.pigmintation(i, this.state.page[15].size, this.state.page[19].size);}
+if(i < 6){this.pigmintation(i, this.state.page[0].size, this.state.page[4].size);}
+}
 
      this.prev = () => {
         if (this.state.start === 0){
-          const s = 950;
-          const e = 1001;
-          this.setState({start: s, end: e});
-          this.getStat(Data, DataUser, s, e);
+          let i = 20;
+          this.setState({numb: i});
+            this.pigmintation(i, this.state.page[14].size, this.state.page[19].size);
         }else{
-const s = this.state.start - 50;
-const e = this.state.end - 50;
-this.setState({start: s, end: e});
-this.getStat(Data, DataUser, s, e);
+          let i = this.state.numb-1;
+          this.setState({numb: i});
+          this.pigm(i);
         }
      }
 
      this.next = () => {
       if (this.state.start === 950){
-        const s = 0;
-        const e = 51;
-        this.setState({start: s, end: e});
-        this.getStat(Data, DataUser, s, e);
+        let i = 1;
+        this.setState({numb: i});
+          this.pigmintation(i, this.state.page[0].size, this.state.page[4].size);
       }else{
-const s = this.state.start + 50;
-const e = this.state.end + 50;
-this.setState({start: s, end: e});
-this.getStat(Data, DataUser, s, e);
+let i = this.state.numb+1;
+this.setState({numb: i});
+  this.pigm(i);
       }
     }
     
-    this.getStat = (Data, DataUser, start, end) => {
-      if(start === 0){        
-        let info = Data.filter(item => item.id < end);
-        let infoUser = DataUser.filter(item => item.user_id < end);
 
-        this.getClicks = (info, infoUser) => {
-          let n = 1;
-          do {
-             if (n === 1){let user = infoUser.filter(item => item.user_id === info[0].id); 
-              let clicks = user.reduce((a, b) => a + b.clicks, 0);
-              let page_views = user.reduce((a, b) => a + b.page_views, 0);
-              let data_clicks = info[0];
-              data_clicks['allClicks'] = clicks;
-              data_clicks['allPage_views'] = page_views;
-            }
-            let user = infoUser.filter(item => item.user_id === info[n].id); 
-              let clicks = user.reduce((a, b) => a + b.clicks, 0);
-              let page_views = user.reduce((a, b) => a + b.page_views, 0);
-              let data_clicks = info[n];
-              data_clicks['allClicks'] = clicks;
-              data_clicks['allPage_views'] = page_views;
-            n += 1;
-          }while ( n < 50);          
-           }
-           this.getClicks (info, infoUser);
-           this.setState({datas: info, datas_users: infoUser});
-
-     }else{         
-      let info1 = Data.filter(item => item.id < end);
-      let infoUser1 = DataUser.filter(item => item.user_id < end);
-      let info = info1.filter(item => item.id > start);
-      let infoUser = infoUser1.filter(item => item.user_id > start);
-
-      this.getClicks = (info, infoUser) => {
-        let n = 1;
-        do {
-          if (n === 1){let user = infoUser.filter(item => item.user_id === info[0].id); 
-            let clicks = user.reduce((a, b) => a + b.clicks, 0);
-            let page_views = user.reduce((a, b) => a + b.page_views, 0);
-            let data_clicks = info[0];
-            data_clicks['allClicks'] = clicks;
-            data_clicks['allPage_views'] = page_views;
-          }
-          let user = infoUser.filter(item => item.user_id === info[n].id); 
-            let clicks = user.reduce((a, b) => a + b.clicks, 0);
-            let page_views = user.reduce((a, b) => a + b.page_views, 0);
-            let data_clicks = info[n];
-            data_clicks['allClicks'] = clicks;
-            data_clicks['allPage_views'] = page_views;
-          n += 1;
-        }while ( n < 50);       
-         }
-         this.getClicks (info, infoUser);
-         this.setState({datas: info, datas_users: infoUser});
-    }
-
- }
     
     this.getStat(Data, DataUser, start, end);
 
+
   }
+
 
   componentWillUnmount() {
     this._isMounted = false; 
   }
     render () {
         return (<div>
-<Heder/>
+<Heder />
 <div className="users-statistics">
     <div className="row justify-content-between">
         <div className="container">
@@ -202,7 +235,8 @@ this.getStat(Data, DataUser, s, e);
     <div className="row justify-content-between">
         <div className="container">
            <h5>Users statistics</h5>
-           <table className="table table-bordered">
+           <div className="table-responsive">
+           <table className="table table-bordered table-striped">
               <thead className="thead-dark">
                 <tr className="bg-primary">
                   <th scope="col">id</th>
@@ -218,22 +252,17 @@ this.getStat(Data, DataUser, s, e);
               <tbody>
               {this.state.datas ?
          this.state.datas.map(data =>
-          <List {...data}  key={data.id} />
+          <List {...data} key={data.id}/>
         ) : <p>Загрузка ... </p>
       }
               </tbody>
              </table>
-
+             </div>
          </div>
          </div>
          <div className="row justify-content-center align-items-center">
-
              <p className="arrow-p"> <i className="arrow left" onClick={this.prev}></i></p>
-             <div className='box' active={this.state.page[0].active}><p className="text-center" box='1'>{this.state.page[0].size}</p></div>
-             <div className='box' active={this.state.page[1].active}><p className="text-center" box='2'>{this.state.page[1].size}</p></div>
-             <div className='box' active={this.state.page[2].active}><p className="text-center" box='3'>{this.state.page[2].size}</p></div>  
-             <div className='box' active={this.state.page[3].active}><p className="text-center" box='4'>{this.state.page[3].size}</p></div>
-             <div className='box' active={this.state.page[4].active}><p className="text-center" box='5'>{this.state.page[4].size}</p></div>
+             <Pagination size="lg">{this.state.items}</Pagination>
                  <p className="arrow-p"> <i className="arrow right" onClick={this.next}></i></p>
 </div>
     

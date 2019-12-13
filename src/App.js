@@ -10,8 +10,8 @@ const App = (props) => {
     return (
      <Router>
          <Route exact path = '/' component = {Home} />
-         <Route path = '/user' component = {Users} />
-         <Route path = '/user/:id' component = {OneUser} />
+         <Route exact path = '/user' component = {Users} />
+         <Route path = '/user/:id' component = {OneUser}/>
      </Router>
     )};
 

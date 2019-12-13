@@ -121,6 +121,14 @@ border-radius: 0.55rem;
     width: 10rem;
     height: 3.8rem;
     }
+    #mobile {
+        margin-top: 20%;
+        height: 80%;
+        img{
+width: 100%;
+height: auto;
+        }
+        }
 }
 }
 
@@ -246,6 +254,12 @@ p {
     .after-h2 {
         font-size: 0.92rem;
         line-height: 1.2rem;
+    }
+    img {
+        
+        margin-top: 2%;
+        margin-left: 1%;
+        margin-right: 1%;
     }
   }
 }
